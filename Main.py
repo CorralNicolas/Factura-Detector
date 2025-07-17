@@ -1,11 +1,15 @@
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 from pdfreader import SimplePDFViewer
 import re
 import io
+import base64
 
 app = FastAPI()
 
+class FileBase64(BaseModel):
+    file: str  # PDF codificado en base64
 
 def es_factura(texto1):
     texto = " ".join(texto1)
@@ -35,12 +39,11 @@ def es_factura(texto1):
 
     return puntuacion >= 5
 
-
 @app.post("/es_factura/")
-async def analizar_pdf(file: UploadFile = File(...)):
+async def analizar_pdf(data: FileBase64):
     try:
-        contents = await file.read()
-        fd = io.BytesIO(contents)
+        pdf_bytes = base64.b64decode(data.file)
+        fd = io.BytesIO(pdf_bytes)
         viewer = SimplePDFViewer(fd)
 
         texto_extraido = []

@@ -1,4 +1,4 @@
 fastapi
-uvicorn[standard]
-python-pdf-reader
+uvicorn
+pdfreader
 pydantic
